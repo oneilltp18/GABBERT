@@ -1,5 +1,5 @@
 # GABBERT
-Capstone Project
+Capstone Project \n
 General
 Analysis for
 Bettering
