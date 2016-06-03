@@ -7,4 +7,26 @@ url = 'http://www.pro-football-reference.com/play-index/psl_finder.cgi?request=1
 r = requests.get(url)
 soup = BeautifulSoup(r.text, 'html.parser')
 
-print soup.prettify()
+""" The total contents of the first page will provide the basis for this scraper. The format
+for each page of a search is identical, so using the first page as a template will allow us to
+unleash the scraper on the rest of the data"""
+
+
+headers = []
+# this loop finds all of the table headers
+table_header = soup.findAll('th')
+for i in table_header:
+    headers.append(i.renderContents())
+
+# this list provides the column headers for wr stats. Ideally, I could find a more pythonic
+# way of pulling out an ordered set of the columns.
+wr_cols = headers[7:41]
+wr_cols
+body = soup.findAll('tbody')
+rows = body[0].findAll('tr')
+len(rows)
+#This pulls down 108 rows, that means that it's also grabbing the column headers# that are peppered throughout
+# They have separate classes, so it should be easy to filter them out.
+stat_rows = [x for x in rows if x['class']==['']]
+len(stat_rows)
+stat_rows
