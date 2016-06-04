@@ -6,10 +6,8 @@ from time import sleep
 
 base_url = 'http://www.pro-football-reference.com/play-index/psl_finder.cgi?request=1&match=single&year_min=1999&year_max=2016&season_start=1&season_end=-1&age_min=0&age_max=99&league_id=NFL&team_id=&is_active=&is_hof=&pos_is_wr=Y&c1stat=height_in&c1comp=gt&c1val=&c2stat=fumbles&c2comp=gt&c2val=&c3stat=rush_yds&c3comp=gt&c3val=&c4stat=pro_bowls&c4comp=gt&c4val=&c5comp=&c5gtlt=lt&c6mult=1.0&c6comp=&order_by=rec&draft=0&draft_year_min=1936&draft_year_max=2016&type=&draft_round_min=0&draft_round_max=99&draft_slot_min=1&draft_slot_max=500&draft_pick_in_round=0&draft_league_id=&draft_team_id=&college_id=all&conference=any&draft_pos_is_qb=Y&draft_pos_is_rb=Y&draft_pos_is_wr=Y&draft_pos_is_te=Y&draft_pos_is_e=Y&draft_pos_is_t=Y&draft_pos_is_g=Y&draft_pos_is_c=Y&draft_pos_is_ol=Y&draft_pos_is_dt=Y&draft_pos_is_de=Y&draft_pos_is_dl=Y&draft_pos_is_ilb=Y&draft_pos_is_olb=Y&draft_pos_is_lb=Y&draft_pos_is_cb=Y&draft_pos_is_s=Y&draft_pos_is_db=Y&draft_pos_is_k=Y&draft_pos_is_p=Y&offset='
 
-
-
-" The total contents of the first page will provide the basis for this scraper. The form
-
+r = requests.get(base_url)
+soup = BeautifulSoup(r.text, 'html.parser')
 
 headers = []
 # this loop finds all of the table headers
@@ -57,6 +55,17 @@ def get_wr_stats():
 get_wr_stats()
 
 len(stats)
+test_df = pd.DataFrame(stats, columns = actual_wr_cols)
+actual_wr_cols = ['rk', 'name', 'season', 'age', 'draft_pos', 'team', 'league', 'height', 'weight', 'bmi', 'games', 'games_started',
+                    'rush_atts', 'rush_yds', 'rush_y/a', 'rush_tds', 'rush_ypg', 'targets', 'receptions', 'rec_yards',
+                    'yards/reception', 'rec_tds', 'rec_ypg', 'ctch_pct', 'y/tgt', 'fumbles', 'fumbles_recovered', 'fum_ret_yds',
+                    'fum_tds', 'forced_fumbles', 'years_in_league', 'pro_bowls', 'all_pros', 'av']
+
+
+test_df.fillna(0.0, inplace=True)
+
+
+
 
 import matplotlib.pyplot as plt
 %matplotlib inline
@@ -65,8 +74,23 @@ test_df.head()
 test_df['Y/Tgt'].value_counts()
 test_df.dtypes
 
-numeric_columns = ['Year', 'Age', 'Wt', 'BMI', 'G', 'GS', 'Att', 'Yds', 'Y/A', 'TD', 'Y/G', 'Tgt', 'Rec', ]
-actual_wr_cols = ['rk', 'name', 'season', 'age', 'draft_pos', 'team', 'league', 'height', 'weight', 'bmi', 'games', 'games_started',
-                    'rush_atts', 'rush_yds', 'rush_y/a', 'rush_tds', 'rush_ypg', 'targets', 'receptions', 'rec_yards',
-                    'yards/reception', 'rec_tds', 'rec_ypg', 'ctch_pct', 'y/tgt', 'fumbles', 'fumbles_recovered', 'fum_ret_yds',
-                    'fum_tds', 'forced_fumbles', 'years_in_league', 'pro_bowls', 'all_pros', 'av']
+numeric_columns = [ 'rk', 'season', 'age', 'weight', 'bmi', 'games', 'games_started',
+                    'rush_atts', 'rush_yds', 'rush_tds', 'targets', 'receptions', 'rec_yards',
+                    'rec_tds','fumbles', 'fumbles_recovered', 'fum_ret_yds',
+                    'fum_tds', 'forced_fumbles', 'years_in_league', 'pro_bowls',
+                    'all_pros', 'av', 'rush_y/a', 'rush_ypg', 'yards/reception', 'rec_ypg', 'y/tgt']
+
+for col in numeric_columns:
+    test_df[col] = test_df[col].convert_objects(convert_numeric=True)
+
+test_df.dtypes
+
+test_df.bmi[4]
+plt.style.use('ggplot')
+plt.scatter(test_df.height, test_df.rec_tds, alpha =0.4)
+
+from sqlalchemy import create_engine
+import psycopg2
+engine = create_engine('postgresql://codylaminack@localhost:5432/nfl')
+
+test_df.to_sql('wide receivers', engine)
