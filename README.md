@@ -21,6 +21,7 @@ NFL players are never more expensive than when they hit the open market of free 
 ## Data
 
 GABBERT will utilize the following data sources:
-    * NFL Box Score data for years 1999 - 2015
-    * Athletic measures from historical combine results
-    * Advanced analytics when possible
+* NFL Box Score data for years 1999 - 2015
+* Athletic measures from historical combine results
+* Advanced analytics when possible
+  
