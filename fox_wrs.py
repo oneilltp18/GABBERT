@@ -26,10 +26,12 @@ def get_rows(soup):
     rows = body.findAll('tr', {'class':''})
     return rows
 
-def strip_stats(rows):
+def strip_stats(rows, i):
     for x in range(0,len(rows)):
         player_stats = rows[x].findAll('td')
-        stats.append([z.text for z in player_stats])
+        player = [z.text for z in player_stats]
+        player.append(i)
+        stats.append(player)
 
 # Define a funciton that will return the number of pages in the search.
 def last_page(soup):
@@ -40,20 +42,33 @@ def last_page(soup):
 
 # for the compiler function, it'll need something increment the counter
 
-def rec_stats(base_url):
+def rec_stats(base_url, i):
     count = 1
     upper_limit = last_page(get_soup(base_url+str(count)))
     while count <= upper_limit:
         url = next_page(base_url, count)
         soup = get_soup(url)
         rows = get_rows(soup)
-        strip_stats(rows)
+        strip_stats(rows, i)
         print '%d Players processed' % len(stats)
         count+=1
         sleep(5)
 
 stats = []
 rec_stats(base_url)
+stats
+# The sixteen_years function will allow us to pull multiple years within the same function,
+# and it will also append a value to the end of each stat row that contains the season year
+def sixteen_years(range):
+    for i in range:
+        year_url = 'http://www.foxsports.com/nfl/stats?season='+str(i)+'&week=100&category=RECEIVING&opp=0&sort=2&qualified=1&sortOrder=0&page='
+        rec_stats(year_url, i)
+sixteen_years(range(1999,2000))
+df = pd.DataFrame(stats)
+df.tail()
+len(stats)
+
+stats2 = rec_stats(base_url)
 
 
 # This function adds the season year onto the end of each player's stat list
