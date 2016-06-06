@@ -108,7 +108,26 @@ df['real_name'] = df['name'].str.extract('([A-Z]\w+, \w+)', expand = False)
 
 
 test = df.proper_name[0]
-df = df.drop('proper_name', axis = 1)
+
 df.head()
 # dump it up into a csv to try and figure out the name thing tomorrow
 df.to_csv('fox_receiving')
+
+df = pd.read_csv('fox_receiving')
+
+df.head()
+
+# Apply regex to a colun in the data frame that puts the name in the proper order
+df['real_name'] = df['real_name'].str.replace(r"([A-Z][\w|\W]*),\s([A-Z][\w|\W]+\b)", r"\2 \1")
+
+
+# replace the wonky 'name' column with the new proper name
+df['name'] = df['real_name']
+
+df.drop('real_name', inplace = True, axis = 1)
+df.drop('Unnamed: 0', inplace = True, axis = 1)
+
+from sqlalchemy import create_engine
+engine = create_engine('postgresql://codylaminack@localhost:5432/nfl')
+
+df.to_sql('fox_receiving', engine)
