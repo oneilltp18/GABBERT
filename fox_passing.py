@@ -5,7 +5,6 @@ import numpy as np
 from time import sleep
 
 
-base_url = 'http://www.foxsports.com/nfl/stats?season=1999&week=100&category=RECEIVING&opp=0&sort=2&qualified=1&sortOrder=0&page='
 # define a function to get the soup
 
 def get_soup(a_url):
@@ -67,34 +66,23 @@ stats
 # The sixteen_years function will allow us to pull multiple years within the same function,
 # and it will also append a value to the end of each stat row that contains the season year
 def sixteen_years(range):
-        year_urls = ['http://www.foxsports.com/nfl/stats?season='+str(x)+'&week=100&category=RECEIVING&opp=0&sort=2&qualified=1&sortOrder=0&page=' for x in range]
+        year_urls = ['http://www.foxsports.com/nfl/stats?season='+str(x)+'&week=100&category=PASSING&opp=0&sort=2&qualified=0&sortOrder=0&page=' for x in range]
         print year_urls
         loc = 0
         for year in year_urls:
             rec_stats(year, range[loc])
             loc +=1
 years = range(1999,2016)
-years
 
 sixteen_years(years)
 
-
-stats[-10:]
-columns = ['name', 'games', 'receptions', 'yards', 'yds_per_ctch', 'yds_per_game',
-            'yac', 'td', 'long_ctch', 'recs_ovr_25', '100yd_gms', 'targets', 'drops',
-            'ctch_pct', 'fumbles', 'fumbles_lost', 'first_down_ctchs', 'first_down_ctchpct',
-            'season']
-
-
+columns = ['name', 'games', 'completions', 'pass_atts', 'comp_pct', 'att_pg',
+            'pass_yards', 'pass_avg', 'avg_ypg', 'pass_tds', 'ints', 'qbr', 'throws_for_1down',
+            '1down_pct', 'long_throw', 'passes_over_25', '300_ydg', 'sacks_taken',
+            'sack_yds', 'fumbles', 'fumbles_lost', 'season']
 df = pd.DataFrame(stats, columns = columns)
-print range(2013,2016)
-len(stats)
-
 
 df.head()
-
-
-import re
 
 # Add a team column using regex and the contents of the full name columns
 df['team'] = df['name'].str.extract('([A-Z][A-Z]+)', expand=True)
@@ -104,19 +92,6 @@ df['team'] = df['name'].str.extract('([A-Z][A-Z]+)', expand=True)
 # pull the phone book style name out of the name column
 df['real_name'] = df['name'].str.extract('([A-Z]\w+, \w+)', expand = False)
 
-
-
-
-test = df.proper_name[0]
-
-df.head()
-# dump it up into a csv to try and figure out the name thing tomorrow
-df.to_csv('fox_receiving')
-
-df = pd.read_csv('fox_receiving')
-
-df.head()
-
 # Apply regex to a colun in the data frame that puts the name in the proper order
 df['real_name'] = df['real_name'].str.replace(r"([A-Z][\w|\W]*),\s([A-Z][\w|\W]+\b)", r"\2 \1")
 
@@ -124,10 +99,17 @@ df['real_name'] = df['real_name'].str.replace(r"([A-Z][\w|\W]*),\s([A-Z][\w|\W]+
 # replace the wonky 'name' column with the new proper name
 df['name'] = df['real_name']
 
+# Drop the redundant 'real_name' column
 df.drop('real_name', inplace = True, axis = 1)
-df.drop('Unnamed: 0', inplace = True, axis = 1)
+
+numerics = ['games', 'completions', 'pass_atts', 'comp_pct', 'att_pg',
+            'pass_yards', 'pass_avg', 'avg_ypg', 'pass_tds', 'ints', 'qbr', 'throws_for_1down',
+            '1down_pct', 'long_throw', 'passes_over_25', '300_ydg', 'sacks_taken',
+            'sack_yds', 'fumbles', 'fumbles_lost', 'season']
+for col in numerics:
+    df[col] = df[col].convert_objects(convert_numeric=True)
 
 from sqlalchemy import create_engine
 engine = create_engine('postgresql://codylaminack@localhost:5432/nfl')
 
-df.to_sql('fox_receiving', engine)
+df.to_sql('fox_passing', engine)
