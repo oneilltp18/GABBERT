@@ -89,7 +89,7 @@ def join_lists(first_table, second_table):
     renamed_df = final_joined_df.rename(columns = {'1999': 'season', 'wr':'position'})
     renamed_df = renamed_df.reset_index()
     return renamed_df
-tables(range(1999,2016), 'wr')
+tables(range(1999,2016), 'te')
 
 df = join_lists(table_1_stats, table_2_stats)
 
@@ -108,6 +108,7 @@ def cleaned_df(df):
     df.drop(df.columns[-2], axis=1, inplace=True)
     return df
 df = cleaned_df(df)
+df.tail(50)
 
 # We can convert some of these columns to numeric values here. Some of them are numerics
 # but can't be converted for some reason.
@@ -120,4 +121,4 @@ for col in numerics:
 from sqlalchemy import create_engine
 engine = create_engine('postgresql://codylaminack@localhost:5432/nfl')
 
-df.to_sql('fo_wrs', engine)
+df.to_sql('fo_tes', engine)
