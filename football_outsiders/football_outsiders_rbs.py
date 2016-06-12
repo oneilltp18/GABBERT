@@ -39,6 +39,7 @@ def strip_stats_one(some_rows, i, pos):
         player.append(link)
         table_1_stats.append(player)
 # define a function that strips the stats from the second table.
+# Using i[-4] gets just the year from the url so it can be appended to the stats
 def strip_stats_two(some_rows, i, pos):
     for x in range(0,len(some_rows)):
         player_stats = some_rows[x].findAll('td')
@@ -86,13 +87,13 @@ def join_lists(first_table, second_table):
     frames = [second_table_df, first_table_df]
     joined_df = pd.concat(frames)
     final_joined_df = joined_df[joined_df['Player']!='Player']
-    renamed_df = final_joined_df.rename(columns = {'1999': 'season', 'wr':'position'})
+    renamed_df = final_joined_df.rename(columns = {'1999': 'season', 'rb':'position'})
     renamed_df = renamed_df.reset_index()
     return renamed_df
-tables(range(1999,2016), 'te')
+tables(range(1999,2016), 'rb')
 
 df = join_lists(table_1_stats, table_2_stats)
-
+df.tail(50)
 # The function 'cleaned_df' does some regex to the newly created DataFrame
 # Specifically it pulls a player's full name from his link information.
 # there's a quirk in the way that fo stores their data that makes this kind of tricky.
@@ -100,25 +101,32 @@ df = join_lists(table_1_stats, table_2_stats)
 #stored as all lower case. That shouldn't be too much of a problem as we can join on
 # lower case columns in sql.
 def cleaned_df(df):
-    df['name'] = df.ix[:,16].apply(lambda x: re.findall(r"([A-Z|a-z]\w+-[A-Z|a-z]\w+)", str(x)))
+    df['name'] = df.ix[:,2].apply(lambda x: re.findall(r"([A-Z|a-z]\w+-[A-Z|a-z]\w+)", str(x)))
     df['name'] = df['name'].apply(lambda x: str(x).replace('-', ' '))
     df['name'] = df['name'].astype(str)
     df['name'] = df['name'].str.extract(r"([A-Z|a-z]\w+\s[A-Z|a-z]\w+)", expand = False)
     df.drop(['index'], axis=1, inplace = True)
-    df.drop(df.columns[-2], axis=1, inplace=True)
+    df.drop(df.columns[1], axis=1, inplace=True)
+    df.fillna('???', inplace=True)
     return df
 df = cleaned_df(df)
-df.tail(50)
+df.head()
 
 # We can convert some of these columns to numeric values here. Some of them are numerics
 # but can't be converted for some reason.
-numerics = ['DYAR', 'YAR', 'DVOA', 'VOA', 'Passes', 'Yards', 'EYds', 'TD', 'CatchRate', 'FUM', 'DPI',
-            'season']
+numerics = ['season', 'DVOA', 'DYAR', 'EYds', 'FUM', 'Runs', 'SucRate', 'TD', 'VOA', 'YAR', 'Yards']
 for col in numerics:
     df[col] = df[col].convert_objects(convert_numeric=True)
 
 # Send this noise up to sql
 from sqlalchemy import create_engine
 engine = create_engine('postgresql://codylaminack@localhost:5432/nfl')
+# This dataframe wasn't being written to sql properly, but if you jumpp to csv first,
+# then add it to sql, it's happy. 
+df.to_csv('fo_rbs')
 
-df.to_sql('fo_tes', engine)
+df2 = pd.read_csv('fo_rbs')
+df2.to_sql('fo_rbs', engine)
+
+df2.SucRate.isnull().sum()
+df2.shape
