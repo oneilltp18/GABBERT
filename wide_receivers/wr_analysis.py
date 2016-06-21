@@ -1,9 +1,14 @@
 import pandas as pd
 import re
 import numpy as np
+from sklearn.preprocessing import scale
+from sklearn.cross_validation import train_test_split
+from sklearn.linear_model import LinearRegression, BayesianRidge
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.svm import SVR
+from sklearn.neighbors import KNeighborsRegressor
 
-
-df = pd.read_csv('https://raw.githubusercontent.com/cl65610/GABBERT/master/wide_receivers/wr_master_join.csv')
+df = pd.read_csv('https://raw.githubusercontent.com/cl65610/GABBERT/master/wide_receivers/wr2.csv')
 df.tail()
 
 df.dtypes
@@ -43,7 +48,6 @@ drop_cols = ['index', 'rk', 'league', 'av', 'years_in_league']
 for col in drop_cols:
     df.drop(col, axis=1, inplace=True)
 
-
 # There are several columns that are listed as percents, but don't serve that purpose. They need the % stripped and then to be converted to percent floats.
 percent_columns = ['ctch_pct', 'first_down_ctchpct', 'DVOA', 'DYAR']
 for col in percent_columns:
@@ -75,24 +79,24 @@ df['pct_team_receptions'] = df['receptions']/df['team_completions']
 
 # What percent of a team's total offense was this player responsible for?
 
-df['pct_of_team_passyards'] = df['rec_yards']/ df['team_pass_yards']
+df['pct_of_team_passyards'] = df['rec_yards']/ df['team_pass_yds']
 
 # What percent of a team's passing touchdowns was a player responsible for?
 
-df['pct_team_touchdowns'] = df['rec_tds']] / df['team_pass_tds']
+df['pct_team_touchdowns'] = df['rec_tds'] / df['team_pass_tds']
 
 
 # Make a column that computes what season a player is in
 df['years_in_league'] = df['season']-df['rookie_season']
-df.head(25)
+df.isnull().sum()
 ### Imputing DVOA
-train = df[(df.DVOA.isnull() ==False) & (df.pct_team_tgts.isnull() == False)]
+train = df[(df.DVOA.isnull() ==False) & (df.pct_team_tgts.isnull() == False)&(df.games.isnull()==False) & (df.years_in_league.isnull()==False)]
 train.reset_index(inplace=True, drop=True)
-test = df[(df.DVOA.isnull() == True) & (df.pct_team_tgts.isnull() == False)]
+test = df[(df.DVOA.isnull() == True) & (df.pct_team_tgts.isnull() == False)&(df.games.isnull()==False)& (df.years_in_league.isnull()==False)]
 test.reset_index(inplace= True, drop=True)
 features = ['targets', 'receptions', 'rec_tds', 'start_ratio', 'pct_team_tgts', 'pct_team_receptions', 'pct_team_touchdowns',
             'rec_yards', 'dpi_yards', 'fumbles', 'years_in_league', 'recs_ovr_25', 'first_down_ctchs', 'pct_of_team_passyards']
-X = train[features]
+X = scale(train[features])
 y = train.DVOA
 
 # Our best model for predicting DVOA was a support vector regressor. We'll fit this model on the
@@ -115,7 +119,7 @@ test.reset_index(inplace= True, drop=True)
 
 features = ['targets', 'receptions', 'rec_tds', 'start_ratio', 'pct_team_tgts', 'pct_team_receptions', 'pct_team_touchdowns',
             'rec_yards', 'dpi_yards', 'fumbles', 'years_in_league', 'recs_ovr_25', 'first_down_ctchs', 'pct_of_team_passyards']
-X = train[features]
+X = scale(train[features])
 y = train.DYAR
 
 # Our best model for predicting DYAR was a Bayesian Ridge Regressor
@@ -137,7 +141,7 @@ test = df[(df.EYds.isnull() == True) & (df.pct_team_tgts.isnull() == False)]
 test.reset_index(inplace= True, drop=True)
 
 # A Bayesian Ridge was also our best predictor for EYds. In general, we're able to most confidently predict EYds.
-X = train[features]
+X = scale(train[features])
 y = train.EYds
 
 br.fit(X,y)
@@ -151,29 +155,28 @@ frames = [train, test]
 df = pd.concat(frames, axis=0, ignore_index=True)
 
 
-### This is to manually change values for certain missing columns
-df.iloc[df[(df.name == 'Steve Smith') & ((df.team == 'NYG') | (df.team == 'PHI') | (df.team == 'STL'))].index, 54] = 2007
-
-df.iloc[df[(df.name == 'Antonio Brown') & (df.team == 'PIT')].index, 54] = 2010
-
-df.iloc[df[(df.name == 'Mike Williams') & ((df.team == 'DET') | (df.team == '2TM') | (df.team == 'SEA'))].index, 54] = 2005
-
-df.iloc[df[(df.name == 'Chris Davis') & (df.team == 'TEN')].index, 54] = 2007
-
-df.iloc[df[(df.name == 'Chris Harper')&(df.team == '2TM')].index, 54] = 2013
-
-df.iloc[df[(df.name == 'Roy Williams')&(df.draft_pos == '1-8')].index, 54] = 2002
-
-df.iloc[df[(df.name == 'Charles Johnson')&(df.draft_pos == 'UDFA')].index, 54] = 2013
-
-df.iloc[df[(df.name == 'Chris Givens')&(df.draft_pos == 'UDFA')].index, 54] = 2012
+# ### This is to manually change values for certain missing columns
+# df.iloc[df[(df.name == 'Steve Smith') & ((df.team == 'NYG') | (df.team == 'PHI') | (df.team == 'STL'))].index, 54] = 2007
+#
+# df.iloc[df[(df.name == 'Antonio Brown') & (df.team == 'PIT')].index, 54] = 2010
+#
+# df.iloc[df[(df.name == 'Mike Williams') & ((df.team == 'DET') | (df.team == '2TM') | (df.team == 'SEA'))].index, 54] = 2005
+#
+# df.iloc[df[(df.name == 'Chris Davis') & (df.team == 'TEN')].index, 54] = 2007
+#
+# df.iloc[df[(df.name == 'Chris Harper')&(df.team == '2TM')].index, 54] = 2013
+#
+# df.iloc[df[(df.name == 'Roy Williams')&(df.draft_pos == '1-8')].index, 54] = 2002
+#
+# df.iloc[df[(df.name == 'Charles Johnson')&(df.draft_pos == 'UDFA')].index, 54] = 2013
+#
+# df.iloc[df[(df.name == 'Chris Givens')&(df.draft_pos == 'UDFA')].index, 54] = 2012
 
 ## Now we can engineer a few features based on filled in data
-df_clean['years_in_league'] = df_clean['season'] - df_clean['rookie_season']
+# df_clean['years_in_league'] = df_clean['season'] - df_clean['rookie_season']
+#
+# df_clean['rookie_age'] = df_clean['age'] - df_clean['years_in_league']
 
-df_clean['rookie_age'] = df_clean['age'] - df_clean['years_in_league']
+df.isnull().sum()
 
-
-
-# df.to_csv('cleaned_wrs.csv')
-
+df.to_csv('wrs_finalish.csv')
