@@ -85,5 +85,70 @@ df['pct_team_touchdowns'] = df['rec_tds']] / df['team_pass_tds']
 # Make a column that computes what season a player is in
 df['years_in_league'] = df['season']-df['rookie_season']
 df.head(25)
+### Imputing DVOA
+train = df[(df.DVOA.isnull() ==False) & (df.pct_team_tgts.isnull() == False)]
+train.reset_index(inplace=True, drop=True)
+test = df[(df.DVOA.isnull() == True) & (df.pct_team_tgts.isnull() == False)]
+test.reset_index(inplace= True, drop=True)
+features = ['targets', 'receptions', 'rec_tds', 'start_ratio', 'pct_team_tgts', 'pct_team_receptions', 'pct_team_touchdowns',
+            'rec_yards', 'dpi_yards', 'fumbles', 'years_in_league', 'recs_ovr_25', 'first_down_ctchs', 'pct_of_team_passyards']
+X = train[features]
+y = train.DVOA
+
+# Our best model for predicting DVOA was a support vector regressor. We'll fit this model on the
+svr = SVR(C=4, epsilon=0.04)
+svr.fit(X,y)
+dvoa_predictions = pd.DataFrame(svr.predict(test[features]), columns=['DVOA_predicts'])
+
+test = test.join(dvoa_predictions)
+test['DVOA'] = test['DVOA_predicts']
+test.drop('DVOA_predicts', inplace=True, axis=1)
+
+frames = [train, test]
+df = pd.concat(frames, axis=0, ignore_index=True)
+
+### Imputing DYAR
+train = df[(df.DYAR.isnull() ==False) & (df.pct_team_tgts.isnull() == False)]
+train.reset_index(inplace=True, drop=True)
+test = df[(df.DYAR.isnull() == True) & (df.pct_team_tgts.isnull() == False)]
+test.reset_index(inplace= True, drop=True)
+
+features = ['targets', 'receptions', 'rec_tds', 'start_ratio', 'pct_team_tgts', 'pct_team_receptions', 'pct_team_touchdowns',
+            'rec_yards', 'dpi_yards', 'fumbles', 'years_in_league', 'recs_ovr_25', 'first_down_ctchs', 'pct_of_team_passyards']
+X = train[features]
+y = train.DYAR
+
+# Our best model for predicting DYAR was a Bayesian Ridge Regressor
+br = BayesianRidge()
+br.fit(X,y)
+dyar_predictions = pd.DataFrame(br.predict(test[features]), columns = ['DYAR_predicts'])
+
+test = test.join(dyar_predictions)
+test['DYAR'] = test['DYAR_predicts']
+test.drop('DYAR_predicts', inplace=True, axis=1)
+
+frames = [train,test]
+df = pd.concat(frames, axis=0, ignore_index=True)
+
+### Imputing EYds
+train = df[(df.EYds.isnull() ==False) & (df.pct_team_tgts.isnull() == False)]
+train.reset_index(inplace=True, drop=True)
+test = df[(df.EYds.isnull() == True) & (df.pct_team_tgts.isnull() == False)]
+test.reset_index(inplace= True, drop=True)
+
+# A Bayesian Ridge was also our best predictor for EYds. In general, we're able to most confidently predict EYds.
+X = train[features]
+y = train.EYds
+
+br.fit(X,y)
+eyds_predictions = pd.DataFrame(br.predict(test[features]), columns = ['EYds_predicts'])
+
+test = test.join(eyds_predictions)
+test['EYds'] = test['EYds_predicts']
+test.drop('EYds_predicts', inplace=True, axis=1)
+
+frames = [train, test]
+df = pd.concat(frames, axis=0, ignore_index=True)
+
 
 # df.to_csv('cleaned_wrs.csv')
