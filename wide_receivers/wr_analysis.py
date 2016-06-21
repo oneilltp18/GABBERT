@@ -1,26 +1,12 @@
 import pandas as pd
 import re
 import numpy as np
-# """ SQL query to pull this df:
-# "SELECT wide_receivers.*, fox_receiving."100yd_gms", fox_receiving."yac", fox_receiving."first_down_ctchs", fox_receiving."first_down_ctchpct", fox_receiving."long_ctch", fox_receiving."recs_ovr_25", fox_receiving."drops", fo_wrs."EYds", fo_wrs."DPI", fo_wrs."DVOA", fo_wrs."DYAR", fo_wrs."position", combine_stats."Hand Size in", combine_stats."Arm Length in", combine_stats."40 Yard", combine_stats."Vert Leap in", combine_stats."Broad Jump in", combine_stats."Shuttle", combine_stats."3Cone", combine_stats."60Yd Shuttle"
-# FROM wide_receivers
-# LEFT JOIN fox_receiving
-# ON CONCAT(wide_receivers."name", wide_receivers."team") = CONCAT(fox_receiving."name", fox_receiving."team")
-# AND wide_receivers."season" = fox_receiving."season"
-# LEFT JOIN fo_wrs
-# ON CONCAT(lower(wide_receivers."name"), wide_receivers."team") = CONCAT(lower(fo_wrs."name"), fo_wrs."Team")
-# and wide_receivers."season" = fo_wrs."season"
-# left JOIN combine_stats
-# ON wide_receivers."name" = combine_stats."Name"
-# AND LOWER(fo_wrs."position") = LOWER(combine_stats."POS")
-# WHERE wide_receivers."position" = 'wr'
 
 
-df = pd.read_csv('/Users/codylaminack/Documents/Practice/GABBERT/sql_wrs.csv')
+df = pd.read_csv('https://raw.githubusercontent.com/cl65610/GABBERT/master/wide_receivers/wr_master_join.csv')
 df.tail()
 
 df.dtypes
-df.height.head()
 
 
 # Create a column that has a player's height in inches
@@ -51,11 +37,36 @@ df['40 Yard'].replace('nan', 0, inplace=True)
 # It doesn't seem like this totally works yet. Can't yet take an average
 pd.to_numeric(df['40 Yard'])
 
+df.columns
+# Drop a lot of the unnecessary columns
+drop_cols = ['index', 'rk', 'league', 'av', 'years_in_league']
+for col in drop_cols:
+    df.drop(col, axis=1, inplace=True)
+
 
 # There are several columns that are listed as percents, but don't serve that purpose. They need the % stripped and then to be converted to percent floats.
 percent_columns = ['ctch_pct', 'first_down_ctchpct', 'DVOA', 'DYAR']
+for col in percent_columns:
+    df[col] = df[col].apply(lambda x: str(x).replace('%', ''))
+    df[col] = df[col].apply(lambda x: float(x)/100)
 
+###
 
-df.head(25)
-# Fill null values on certain columns
+# Fill null values on numeric columns
+na_fills = ['rush_atts', 'rush_yds', 'rush_y/a', 'rush_tds', 'rush_ypg', 'targets',
+            'receptions', 'rec_yards', 'yards/reception', 'rec_tds', 'rec_ypg',
+            'ctch_pct', 'y/tgt', 'fumbles', 'fumbles_recovered', 'fum_ret_yds', 'fum_tds',
+            'forced_fumbles', '100yd_gms', 'yac', 'first_down_ctchs', 'first_down_ctchpct', 'long_ctch',
+            'recs_ovr_25', 'drops']
+for col in na_fills:
+    df[col].fillna(0, inplace=True)
+
+# Fill null value on the draft position column
 df.draft_pos.fillna('UDFA', inplace=True)
+
+
+# Make a column that computes what season a player is in
+df['years_in_league'] = df['season']-df['rookie_season']
+df.head(25)
+
+df.to_csv('cleaned_wrs.csv')
