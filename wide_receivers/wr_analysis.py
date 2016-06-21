@@ -63,10 +63,27 @@ for col in na_fills:
 
 # Fill null value on the draft position column
 df.draft_pos.fillna('UDFA', inplace=True)
+df.columns
+# Engineer some columns that show what percentage of a team's total offense a player represents
+
+# What percent of pass attempts were targed at a player?
+df['pct_team_tgts'] = df['targets'] /df['team_pass_attempts']
+
+# What percent of a team's total receptions is a player responsible for?
+
+df['pct_team_receptions'] = df['receptions']/df['team_completions']
+
+# What percent of a team's total offense was this player responsible for?
+
+df['pct_of_team_passyards'] = df['rec_yards']/ df['team_pass_yards']
+
+# What percent of a team's passing touchdowns was a player responsible for?
+
+df['pct_team_touchdowns'] = df['rec_tds']] / df['team_pass_tds']
 
 
 # Make a column that computes what season a player is in
 df['years_in_league'] = df['season']-df['rookie_season']
 df.head(25)
 
-df.to_csv('cleaned_wrs.csv')
+# df.to_csv('cleaned_wrs.csv')
