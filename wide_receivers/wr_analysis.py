@@ -151,4 +151,29 @@ frames = [train, test]
 df = pd.concat(frames, axis=0, ignore_index=True)
 
 
+### This is to manually change values for certain missing columns
+df.iloc[df[(df.name == 'Steve Smith') & ((df.team == 'NYG') | (df.team == 'PHI') | (df.team == 'STL'))].index, 54] = 2007
+
+df.iloc[df[(df.name == 'Antonio Brown') & (df.team == 'PIT')].index, 54] = 2010
+
+df.iloc[df[(df.name == 'Mike Williams') & ((df.team == 'DET') | (df.team == '2TM') | (df.team == 'SEA'))].index, 54] = 2005
+
+df.iloc[df[(df.name == 'Chris Davis') & (df.team == 'TEN')].index, 54] = 2007
+
+df.iloc[df[(df.name == 'Chris Harper')&(df.team == '2TM')].index, 54] = 2013
+
+df.iloc[df[(df.name == 'Roy Williams')&(df.draft_pos == '1-8')].index, 54] = 2002
+
+df.iloc[df[(df.name == 'Charles Johnson')&(df.draft_pos == 'UDFA')].index, 54] = 2013
+
+df.iloc[df[(df.name == 'Chris Givens')&(df.draft_pos == 'UDFA')].index, 54] = 2012
+
+## Now we can engineer a few features based on filled in data
+df_clean['years_in_league'] = df_clean['season'] - df_clean['rookie_season']
+
+df_clean['rookie_age'] = df_clean['age'] - df_clean['years_in_league']
+
+
+
 # df.to_csv('cleaned_wrs.csv')
+
