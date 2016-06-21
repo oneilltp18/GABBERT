@@ -172,6 +172,39 @@ df = pd.concat(frames, axis=0, ignore_index=True)
 #
 # df.iloc[df[(df.name == 'Chris Givens')&(df.draft_pos == 'UDFA')].index, 54] = 2012
 
+
+
+
+## filling missing age values
+df.age[2169] = 22
+df.age[2209] = 23
+df.age[2399] = 22
+df.age[3016] = 23
+df.age[3061] = 24
+df.age[3100] = 23
+df.age[3143] = 22
+df.age[3180] = 24
+
+## filling missing bmi values
+df.bmi[586] = 24.7
+df.bmi[1484] = 24.7
+df.bmi[1564] = 25.0
+df.bmi[2292] = 24.7
+df.bmi[3004] = 24.7
+
+## filling missing height in inches values
+df.height_inches[586] = 78
+df.height_inches[1484] = 78
+df.height_inches[1564] = 71
+df.height_inches[2292] = 78
+df.height_inches[3004] = 78
+
+## fixing rookie age column
+df.rookie_age = df.age - df.years_in_league
+
+
+
+
 ## Now we can engineer a few features based on filled in data
 # df_clean['years_in_league'] = df_clean['season'] - df_clean['rookie_season']
 #
