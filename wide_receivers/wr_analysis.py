@@ -104,47 +104,17 @@ df.iloc[df[(df.name == 'Chris Givens')&(df.draft_pos == 'UDFA')].index, 54] = 20
 
 
 
-## filling missing age values
-df.age[2196] = 22
-df.age[2237] = 23
-df.age[2427] = 22
-df.age[3044] = 23
-df.age[3089] = 24
-df.age[3128] = 23
-df.age[3171] = 22
-df.age[3210] = 24
-
-## filling missing bmi values
-df.bmi[590] = 24.7
-df.bmi[1505] = 24.7
-df.bmi[1585] = 25.0
-df.bmi[2320] = 24.7
-df.bmi[3032] = 24.7
-
-## filling missing height in inches values
-df.height_inches[590] = 78
-df.height_inches[1505] = 78
-df.height_inches[1585] = 71
-df.height_inches[2320] = 78
-df.height_inches[3032] = 78
 
 
-# Make a column that computes what season a player is in
-df['years_in_league'] = df['season']-df['rookie_season']
-df.isnull().sum()
-## fixing rookie age column
-df.rookie_age = df.age - df.years_in_league
 
-# Make a column that computes what season a player is in
-df['years_in_league'] = df['season']-df['rookie_season']
-df.isnull().sum()
+
 ### Imputing DVOA
-train = df[(df.DVOA.isnull() ==False) & (df.pct_team_tgts.isnull() == False)&(df.games.isnull()==False) & (df.years_in_league.isnull()==False)]
+train = df[(df.DVOA.isnull() ==False) & (df.pct_team_tgts.isnull() == False)&(df.games.isnull()==False)]
 train.reset_index(inplace=True, drop=True)
-test = df[(df.DVOA.isnull() == True) & (df.pct_team_tgts.isnull() == False)&(df.games.isnull()==False)& (df.years_in_league.isnull()==False)]
+test = df[(df.DVOA.isnull() == True) & (df.pct_team_tgts.isnull() == False)&(df.games.isnull()==False)]
 test.reset_index(inplace= True, drop=True)
 features = ['targets', 'receptions', 'rec_tds', 'start_ratio', 'pct_team_tgts', 'pct_team_receptions', 'pct_team_touchdowns',
-            'rec_yards', 'dpi_yards', 'fumbles', 'years_in_league', 'recs_ovr_25', 'first_down_ctchs', 'pct_of_team_passyards']
+            'rec_yards', 'dpi_yards', 'fumbles', 'recs_ovr_25', 'first_down_ctchs', 'pct_of_team_passyards']
 X = scale(train[features])
 y = train.DVOA
 
@@ -167,7 +137,7 @@ test = df[(df.DYAR.isnull() == True) & (df.pct_team_tgts.isnull() == False)]
 test.reset_index(inplace= True, drop=True)
 
 features = ['targets', 'receptions', 'rec_tds', 'start_ratio', 'pct_team_tgts', 'pct_team_receptions', 'pct_team_touchdowns',
-            'rec_yards', 'dpi_yards', 'fumbles', 'years_in_league', 'recs_ovr_25', 'first_down_ctchs', 'pct_of_team_passyards']
+            'rec_yards', 'dpi_yards', 'fumbles', 'recs_ovr_25', 'first_down_ctchs', 'pct_of_team_passyards']
 X = scale(train[features])
 y = train.DYAR
 
@@ -209,7 +179,39 @@ df.tail()
 
 
 
+## filling missing age values
+df.age[2196] = 22
+df.age[2237] = 23
+df.age[2427] = 22
+df.age[3044] = 23
+df.age[3089] = 24
+df.age[3128] = 23
+df.age[3171] = 22
+df.age[3210] = 24
 
+## filling missing bmi values
+df.bmi[590] = 24.7
+df.bmi[1505] = 24.7
+df.bmi[1585] = 25.0
+df.bmi[2320] = 24.7
+df.bmi[3032] = 24.7
+
+## filling missing height in inches values
+df.height_inches[590] = 78
+df.height_inches[1505] = 78
+df.height_inches[1585] = 71
+df.height_inches[2320] = 78
+df.height_inches[3032] = 78
+
+
+# Make a column that computes what season a player is in
+df['years_in_league'] = df['season']-df['rookie_season']
+df.isnull().sum()
+## fixing rookie age column
+df.rookie_age = df.age - df.years_in_league
+
+# Make a column that computes what season a player is in
+df['years_in_league'] = df['season']-df['rookie_season']
 ## Now we can engineer a few features based on filled in data
 # df_clean['years_in_league'] = df_clean['season'] - df_clean['rookie_season']
 #
