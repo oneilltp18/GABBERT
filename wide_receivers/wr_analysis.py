@@ -104,29 +104,30 @@ df.iloc[df[(df.name == 'Chris Givens')&(df.draft_pos == 'UDFA')].index, 54] = 20
 
 
 
-# ## filling missing age values
-# df.age[2169] = 22
-# df.age[2209] = 23
-# df.age[2399] = 22
-# df.age[3016] = 23
-# df.age[3061] = 24
-# df.age[3100] = 23
-# df.age[3143] = 22
-# df.age[3180] = 24
-#
-# ## filling missing bmi values
-# df.bmi[586] = 24.7
-# df.bmi[1484] = 24.7
-# df.bmi[1564] = 25.0
-# df.bmi[2292] = 24.7
-# df.bmi[3004] = 24.7
-#
-# ## filling missing height in inches values
-# df.height_inches[586] = 78
-# df.height_inches[1484] = 78
-# df.height_inches[1564] = 71
-# df.height_inches[2292] = 78
-# df.height_inches[3004] = 78
+## filling missing age values
+df.age[2196] = 22
+df.age[2237] = 23
+df.age[2427] = 22
+df.age[3044] = 23
+df.age[3089] = 24
+df.age[3128] = 23
+df.age[3171] = 22
+df.age[3210] = 24
+
+## filling missing bmi values
+df.bmi[590] = 24.7
+df.bmi[1505] = 24.7
+df.bmi[1585] = 25.0
+df.bmi[2320] = 24.7
+df.bmi[3032] = 24.7
+
+## filling missing height in inches values
+df.height_inches[590] = 78
+df.height_inches[1505] = 78
+df.height_inches[1585] = 71
+df.height_inches[2320] = 78
+df.height_inches[3032] = 78
+
 
 # Make a column that computes what season a player is in
 df['years_in_league'] = df['season']-df['rookie_season']
@@ -215,7 +216,5 @@ df.tail()
 # df_clean['rookie_age'] = df_clean['age'] - df_clean['years_in_league']
 
 df.isnull().sum()
-df[df.name=='John Brown'].bmi = 25
-df[df.name=='John Brown'].height_inches = 71
 
 df.to_csv('wrs_finalish.csv')
