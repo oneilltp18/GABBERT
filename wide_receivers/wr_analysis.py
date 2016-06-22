@@ -84,7 +84,55 @@ df['pct_of_team_passyards'] = df['rec_yards']/ df['team_pass_yds']
 # What percent of a team's passing touchdowns was a player responsible for?
 
 df['pct_team_touchdowns'] = df['rec_tds'] / df['team_pass_tds']
+# ### This is to manually change values for certain missing columns
+df.iloc[df[(df.name == 'Steve Smith') & ((df.team == 'NYG') | (df.team == 'PHI') | (df.team == 'STL'))].index, 54] = 2007
 
+df.iloc[df[(df.name == 'Antonio Brown') & (df.team == 'PIT')].index, 54] = 2010
+
+df.iloc[df[(df.name == 'Mike Williams') & ((df.team == 'DET') | (df.team == '2TM') | (df.team == 'SEA'))].index, 54] = 2005
+
+df.iloc[df[(df.name == 'Chris Davis') & (df.team == 'TEN')].index, 54] = 2007
+
+df.iloc[df[(df.name == 'Chris Harper')&(df.team == '2TM')].index, 54] = 2013
+
+df.iloc[df[(df.name == 'Roy Williams')&(df.draft_pos == '1-8')].index, 54] = 2002
+
+df.iloc[df[(df.name == 'Charles Johnson')&(df.draft_pos == 'UDFA')].index, 54] = 2013
+
+df.iloc[df[(df.name == 'Chris Givens')&(df.draft_pos == 'UDFA')].index, 54] = 2012
+
+
+
+
+# ## filling missing age values
+# df.age[2169] = 22
+# df.age[2209] = 23
+# df.age[2399] = 22
+# df.age[3016] = 23
+# df.age[3061] = 24
+# df.age[3100] = 23
+# df.age[3143] = 22
+# df.age[3180] = 24
+#
+# ## filling missing bmi values
+# df.bmi[586] = 24.7
+# df.bmi[1484] = 24.7
+# df.bmi[1564] = 25.0
+# df.bmi[2292] = 24.7
+# df.bmi[3004] = 24.7
+#
+# ## filling missing height in inches values
+# df.height_inches[586] = 78
+# df.height_inches[1484] = 78
+# df.height_inches[1564] = 71
+# df.height_inches[2292] = 78
+# df.height_inches[3004] = 78
+
+# Make a column that computes what season a player is in
+df['years_in_league'] = df['season']-df['rookie_season']
+df.isnull().sum()
+## fixing rookie age column
+df.rookie_age = df.age - df.years_in_league
 
 # Make a column that computes what season a player is in
 df['years_in_league'] = df['season']-df['rookie_season']
@@ -102,7 +150,7 @@ y = train.DVOA
 # Our best model for predicting DVOA was a support vector regressor. We'll fit this model on the
 svr = SVR(C=4, epsilon=0.04)
 svr.fit(X,y)
-dvoa_predictions = pd.DataFrame(svr.predict(test[features]), columns=['DVOA_predicts'])
+dvoa_predictions = pd.DataFrame(scale(svr.predict(test[features])), columns=['DVOA_predicts'])
 
 test = test.join(dvoa_predictions)
 test['DVOA'] = test['DVOA_predicts']
@@ -125,7 +173,7 @@ y = train.DYAR
 # Our best model for predicting DYAR was a Bayesian Ridge Regressor
 br = BayesianRidge()
 br.fit(X,y)
-dyar_predictions = pd.DataFrame(br.predict(test[features]), columns = ['DYAR_predicts'])
+dyar_predictions = pd.DataFrame(br.predict(scale(test[features])), columns = ['DYAR_predicts'])
 
 test = test.join(dyar_predictions)
 test['DYAR'] = test['DYAR_predicts']
@@ -145,7 +193,7 @@ X = scale(train[features])
 y = train.EYds
 
 br.fit(X,y)
-eyds_predictions = pd.DataFrame(br.predict(test[features]), columns = ['EYds_predicts'])
+eyds_predictions = pd.DataFrame(scale(br.predict(test[features])), columns = ['EYds_predicts'])
 
 test = test.join(eyds_predictions)
 test['EYds'] = test['EYds_predicts']
@@ -154,53 +202,9 @@ test.drop('EYds_predicts', inplace=True, axis=1)
 frames = [train, test]
 df = pd.concat(frames, axis=0, ignore_index=True)
 
-
+df.tail()
 # ### This is to manually change values for certain missing columns
-# df.iloc[df[(df.name == 'Steve Smith') & ((df.team == 'NYG') | (df.team == 'PHI') | (df.team == 'STL'))].index, 54] = 2007
-#
-# df.iloc[df[(df.name == 'Antonio Brown') & (df.team == 'PIT')].index, 54] = 2010
-#
-# df.iloc[df[(df.name == 'Mike Williams') & ((df.team == 'DET') | (df.team == '2TM') | (df.team == 'SEA'))].index, 54] = 2005
-#
-# df.iloc[df[(df.name == 'Chris Davis') & (df.team == 'TEN')].index, 54] = 2007
-#
-# df.iloc[df[(df.name == 'Chris Harper')&(df.team == '2TM')].index, 54] = 2013
-#
-# df.iloc[df[(df.name == 'Roy Williams')&(df.draft_pos == '1-8')].index, 54] = 2002
-#
-# df.iloc[df[(df.name == 'Charles Johnson')&(df.draft_pos == 'UDFA')].index, 54] = 2013
-#
-# df.iloc[df[(df.name == 'Chris Givens')&(df.draft_pos == 'UDFA')].index, 54] = 2012
 
-
-
-
-## filling missing age values
-df.age[2169] = 22
-df.age[2209] = 23
-df.age[2399] = 22
-df.age[3016] = 23
-df.age[3061] = 24
-df.age[3100] = 23
-df.age[3143] = 22
-df.age[3180] = 24
-
-## filling missing bmi values
-df.bmi[586] = 24.7
-df.bmi[1484] = 24.7
-df.bmi[1564] = 25.0
-df.bmi[2292] = 24.7
-df.bmi[3004] = 24.7
-
-## filling missing height in inches values
-df.height_inches[586] = 78
-df.height_inches[1484] = 78
-df.height_inches[1564] = 71
-df.height_inches[2292] = 78
-df.height_inches[3004] = 78
-
-## fixing rookie age column
-df.rookie_age = df.age - df.years_in_league
 
 
 
@@ -211,5 +215,7 @@ df.rookie_age = df.age - df.years_in_league
 # df_clean['rookie_age'] = df_clean['age'] - df_clean['years_in_league']
 
 df.isnull().sum()
+df[df.name=='John Brown'].bmi = 25
+df[df.name=='John Brown'].height_inches = 71
 
 df.to_csv('wrs_finalish.csv')
