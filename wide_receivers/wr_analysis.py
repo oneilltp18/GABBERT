@@ -8,7 +8,7 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.svm import SVR
 from sklearn.neighbors import KNeighborsRegressor
 
-df = pd.read_csv('https://raw.githubusercontent.com/cl65610/GABBERT/master/wide_receivers/wr_sql.csv')
+df = pd.read_csv('wr_sql.csv')
 df.tail()
 
 
@@ -62,8 +62,8 @@ for col in percent_columns:
 na_fills = ['rush_atts', 'rush_yds', 'rush_y/a', 'rush_tds', 'rush_ypg', 'targets',
             'receptions', 'rec_yards', 'yards/reception', 'rec_tds', 'rec_ypg',
             'ctch_pct', 'y/tgt', 'fumbles', 'fumbles_recovered', 'fum_ret_yds', 'fum_tds',
-            'forced_fumbles', '100yd_gms', 'yac', 'first_down_ctchs', 'first_down_ctchpct', 'long_ctch',
-            'recs_ovr_25', 'drops']
+            'forced_fumbles', '100yd_gms', 'first_down_ctchs', 'first_down_ctchpct', 'long_ctch',
+            'drops']
 for col in na_fills:
     df[col].fillna(0, inplace=True)
 
@@ -116,7 +116,7 @@ train.reset_index(inplace=True, drop=True)
 test = df[(df.DVOA.isnull() == True) & (df.pct_team_tgts.isnull() == False)&(df.games.isnull()==False)]
 test.reset_index(inplace= True, drop=True)
 features = ['targets', 'receptions', 'rec_tds', 'start_ratio', 'pct_team_tgts', 'pct_team_receptions', 'pct_team_touchdowns',
-            'rec_yards', 'dpi_yards', 'fumbles', 'recs_ovr_25', 'first_down_ctchs', 'pct_of_team_passyards']
+            'rec_yards', 'dpi_yards', 'fumbles', 'first_down_ctchs', 'pct_of_team_passyards']
 X = scale(train[features])
 y = train.DVOA
 
@@ -139,7 +139,7 @@ test = df[(df.DYAR.isnull() == True) & (df.pct_team_tgts.isnull() == False)]
 test.reset_index(inplace= True, drop=True)
 
 features = ['targets', 'receptions', 'rec_tds', 'start_ratio', 'pct_team_tgts', 'pct_team_receptions', 'pct_team_touchdowns',
-            'rec_yards', 'dpi_yards', 'fumbles', 'recs_ovr_25', 'first_down_ctchs', 'pct_of_team_passyards']
+            'rec_yards', 'dpi_yards', 'fumbles', 'first_down_ctchs', 'pct_of_team_passyards']
 X = scale(train[features])
 y = train.DYAR
 
@@ -209,7 +209,7 @@ df.height_inches[2320] = 78
 # Make a column that computes what season a player is in
 df['years_in_league'] = df['season']-df['rookie_season']
 df.isnull().sum()
-df[df.height_inches.isnull()==True]
+df[df.yac.isnull()==True]
 ## fixing rookie age column
 df.rookie_age = df.age - df.years_in_league
 
