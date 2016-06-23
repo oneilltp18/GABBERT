@@ -8,10 +8,9 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.svm import SVR
 from sklearn.neighbors import KNeighborsRegressor
 
-df = pd.read_csv('https://raw.githubusercontent.com/cl65610/GABBERT/master/wide_receivers/wr2.csv')
+df = pd.read_csv('https://raw.githubusercontent.com/cl65610/GABBERT/master/wide_receivers/wr_sql.csv')
 df.tail()
 
-df.dtypes
 
 
 # Create a column that has a player's height in inches
@@ -48,10 +47,13 @@ drop_cols = ['index', 'rk', 'league', 'av', 'years_in_league']
 for col in drop_cols:
     df.drop(col, axis=1, inplace=True)
 
+
 # There are several columns that are listed as percents, but don't serve that purpose. They need the % stripped and then to be converted to percent floats.
 percent_columns = ['ctch_pct', 'first_down_ctchpct', 'DVOA', 'DYAR']
 for col in percent_columns:
     df[col] = df[col].apply(lambda x: str(x).replace('%', ''))
+    df[col] = df[col].apply(lambda x: str(x).replace('-', '-0'))
+    df[col] = df[col].apply(lambda x: str(x).strip())
     df[col] = df[col].apply(lambda x: float(x)/100)
 
 ###
@@ -180,33 +182,34 @@ df.tail()
 
 
 ## filling missing age values
-df.age[2196] = 22
+df.age[2195] = 22
 df.age[2237] = 23
-df.age[2427] = 22
-df.age[3044] = 23
-df.age[3089] = 24
-df.age[3128] = 23
-df.age[3171] = 22
-df.age[3210] = 24
+df.age[2428] = 22
+df.age[3042] = 23
+df.age[3087] = 24
+df.age[3127] = 23
+df.age[3172] = 22
+df.age[3208] = 24
 
 ## filling missing bmi values
-df.bmi[590] = 24.7
-df.bmi[1505] = 24.7
-df.bmi[1585] = 25.0
+df.bmi[591] = 24.7
+df.bmi[1508] = 24.7
+df.bmi[1584] = 25.0
+df.bmi[3031] = 24.7
 df.bmi[2320] = 24.7
-df.bmi[3032] = 24.7
 
 ## filling missing height in inches values
-df.height_inches[590] = 78
-df.height_inches[1505] = 78
-df.height_inches[1585] = 71
+df.height_inches[591] = 78
+df.height_inches[1508] = 78
+df.height_inches[1584] = 71
+df.height_inches[3031] = 78
 df.height_inches[2320] = 78
-df.height_inches[3032] = 78
 
 
 # Make a column that computes what season a player is in
 df['years_in_league'] = df['season']-df['rookie_season']
 df.isnull().sum()
+df[df.height_inches.isnull()==True]
 ## fixing rookie age column
 df.rookie_age = df.age - df.years_in_league
 
@@ -217,6 +220,6 @@ df['years_in_league'] = df['season']-df['rookie_season']
 #
 # df_clean['rookie_age'] = df_clean['age'] - df_clean['years_in_league']
 
-df.isnull().sum()
+df[df.name == 'Antonio Brown'].first_down_ctchs
 
 df.to_csv('wrs_finalish.csv')
