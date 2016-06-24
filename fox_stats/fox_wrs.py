@@ -115,17 +115,22 @@ df.drop('real_name', inplace = True, axis = 1)
 
 test = df.proper_name[0]
 
-df[df.team == 'CAR'].tail(15)
+df[df.team == 'NYG'].name.tail(15)
 # dump it up into a csv to try and figure out the name thing tomorrow
 df.to_csv('updated_fox_receiving.csv')
 
 
 df.head()
 
+df2 = pd.read_csv('https://raw.githubusercontent.com/cl65610/GABBERT/master/updated_fox_receiving.csv')
 
+df2[df2.team == 'NYG'].name.tail(20)
+
+df2.name = df2.name.str.replace(' Jr.', '')
+df2.name = df2.name.str.replace(' Sr.', '')
 
 
 from sqlalchemy import create_engine
 engine = create_engine('postgresql://codylaminack@localhost:5432/nfl')
 
-df.to_sql('fox_receiving', engine)
+df2.to_sql('fox_receiving', engine)

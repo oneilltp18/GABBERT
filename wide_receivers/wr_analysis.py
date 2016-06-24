@@ -12,7 +12,6 @@ df = pd.read_csv('wr_sql.csv')
 df.tail()
 
 
-
 # Create a column that has a player's height in inches
 df['height_inches'] = pd.to_numeric(df.height.str.extract(r"([0-9])", expand = False))*12 + pd.to_numeric(df.height.str.extract(r"-([0-9]+)", expand = False))
 # Now that we have the height in inches, we don't need this comlumn
@@ -175,6 +174,8 @@ test.drop('EYds_predicts', inplace=True, axis=1)
 frames = [train, test]
 df = pd.concat(frames, axis=0, ignore_index=True)
 
+
+
 df.tail()
 # ### This is to manually change values for certain missing columns
 
@@ -182,34 +183,34 @@ df.tail()
 
 
 ## filling missing age values
-df.age[2195] = 22
+df.age[2196] = 22
 df.age[2237] = 23
-df.age[2428] = 22
-df.age[3042] = 23
+df.age[2427] = 22
+df.age[3043] = 23
 df.age[3087] = 24
 df.age[3127] = 23
-df.age[3172] = 22
-df.age[3208] = 24
+df.age[3171] = 22
+df.age[3210] = 24
 
 ## filling missing bmi values
-df.bmi[591] = 24.7
-df.bmi[1508] = 24.7
+df.bmi[590] = 24.7
+df.bmi[1507] = 24.7
 df.bmi[1584] = 25.0
-df.bmi[3031] = 24.7
-df.bmi[2320] = 24.7
+df.bmi[3029] = 24.7
+df.bmi[2319] = 24.7
 
 ## filling missing height in inches values
-df.height_inches[591] = 78
-df.height_inches[1508] = 78
+df.height_inches[590] = 78
+df.height_inches[1507] = 78
 df.height_inches[1584] = 71
-df.height_inches[3031] = 78
-df.height_inches[2320] = 78
+df.height_inches[3029] = 78
+df.height_inches[2319] = 78
 
 
 # Make a column that computes what season a player is in
 df['years_in_league'] = df['season']-df['rookie_season']
-df.isnull().sum()
-df[df.yac.isnull()==True]
+
+
 ## fixing rookie age column
 df.rookie_age = df.age - df.years_in_league
 
@@ -220,6 +221,5 @@ df['years_in_league'] = df['season']-df['rookie_season']
 #
 # df_clean['rookie_age'] = df_clean['age'] - df_clean['years_in_league']
 
-df[df.name == 'Antonio Brown'].first_down_ctchs
 
 df.to_csv('wrs_finalish.csv')
