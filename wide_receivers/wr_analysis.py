@@ -8,7 +8,7 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.svm import SVR
 from sklearn.neighbors import KNeighborsRegressor
 
-df = pd.read_csv('wr_sql.csv')
+df = pd.read_csv('final_wr.csv')
 df.tail()
 
 
@@ -175,36 +175,36 @@ frames = [train, test]
 df = pd.concat(frames, axis=0, ignore_index=True)
 
 
-
+df.isnull().sum()
 df.tail()
 # ### This is to manually change values for certain missing columns
 
 
-
+df[df.height_inches.isnull()==True]
 
 ## filling missing age values
-df.age[2196] = 22
-df.age[2237] = 23
-df.age[2427] = 22
-df.age[3043] = 23
-df.age[3087] = 24
-df.age[3127] = 23
-df.age[3171] = 22
-df.age[3210] = 24
+df.age[1957] = 24
+df.age[2035] = 23
+df.age[2270] = 23
+df.age[2434] = 22
+df.age[2703] = 22
+df.age[2965] = 22
+df.age[2985] = 22
+df.age[3223] = 24
 
 ## filling missing bmi values
-df.bmi[590] = 24.7
-df.bmi[1507] = 24.7
-df.bmi[1584] = 25.0
-df.bmi[3029] = 24.7
-df.bmi[2319] = 24.7
+df.bmi[945] = 24.7
+df.bmi[946] = 24.7
+df.bmi[1715] = 25.0
+df.bmi[2760] = 24.7
+df.bmi[2761] = 24.7
 
 ## filling missing height in inches values
-df.height_inches[590] = 78
-df.height_inches[1507] = 78
-df.height_inches[1584] = 71
-df.height_inches[3029] = 78
-df.height_inches[2319] = 78
+df.height_inches[945] = 78
+df.height_inches[946] = 78
+df.height_inches[1715] = 71
+df.height_inches[2760] = 78
+df.height_inches[2761] = 78
 
 
 # Make a column that computes what season a player is in
@@ -222,4 +222,4 @@ df['years_in_league'] = df['season']-df['rookie_season']
 # df_clean['rookie_age'] = df_clean['age'] - df_clean['years_in_league']
 
 
-df.to_csv('wrs_finalish.csv')
+df.to_csv('final_wr.csv')
