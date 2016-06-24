@@ -128,6 +128,8 @@ df2[df2.team == 'NYG'].name.tail(20)
 
 df2.name = df2.name.str.replace(' Jr.', '')
 df2.name = df2.name.str.replace(' Sr.', '')
+df2.name = df2.name.str.replace('II', '')
+df2.name = df2.name.str.replace('III', '')
 
 
 from sqlalchemy import create_engine
