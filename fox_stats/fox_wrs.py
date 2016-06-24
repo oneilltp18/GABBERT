@@ -102,30 +102,28 @@ df['team'] = df['name'].str.extract('([A-Z][A-Z]+)', expand=True)
 
 
 # pull the phone book style name out of the name column
-df['real_name'] = df['name'].str.extract('([A-Z]\w+, \w+)', expand = False)
+df['real_name'] = df['name'].str.extract('([A-Z][\w\W]+,\s[a-zA-Z|\'|\.|\-]+)\\n[A-Z]', expand = False)
 
-
-
-
-test = df.proper_name[0]
-
-df.head()
-# dump it up into a csv to try and figure out the name thing tomorrow
-df.to_csv('fox_receiving')
-
-df = pd.read_csv('fox_receiving')
-
-df.head()
-
-# Apply regex to a colun in the data frame that puts the name in the proper order
-df['real_name'] = df['real_name'].str.replace(r"([A-Z][\w|\W]*),\s([A-Z][\w|\W]+\b)", r"\2 \1")
-
+# Apply regex to a column in the data frame that puts the name in the proper order
+df['real_name'] = df['real_name'].str.replace(r"([A-Z][\w\W]+),\s([a-zA-Z|\'|\.|\-]+)", r"\2 \1")
 
 # replace the wonky 'name' column with the new proper name
 df['name'] = df['real_name']
 
+#Drop the unnecessary column
 df.drop('real_name', inplace = True, axis = 1)
-df.drop('Unnamed: 0', inplace = True, axis = 1)
+
+test = df.proper_name[0]
+
+df[df.team == 'CAR'].tail(15)
+# dump it up into a csv to try and figure out the name thing tomorrow
+df.to_csv('updated_fox_receiving.csv')
+
+
+df.head()
+
+
+
 
 from sqlalchemy import create_engine
 engine = create_engine('postgresql://codylaminack@localhost:5432/nfl')
