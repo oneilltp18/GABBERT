@@ -122,7 +122,7 @@ df.to_csv('updated_fox_receiving.csv')
 
 df.head()
 
-df2 = pd.read_csv('https://raw.githubusercontent.com/cl65610/GABBERT/master/updated_fox_receiving.csv')
+df2 = pd.read_csv('https://raw.githubusercontent.com/cl65610/GABBERT/master/fox_stats/updated_fox_receiving.csv')
 
 df2[df2.team == 'NYG'].name.tail(20)
 
