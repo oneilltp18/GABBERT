@@ -183,28 +183,28 @@ df.tail()
 df[df.height_inches.isnull()==True]
 
 ## filling missing age values
-df.age[1957] = 24
-df.age[2035] = 23
-df.age[2270] = 23
-df.age[2434] = 22
-df.age[2703] = 22
-df.age[2965] = 22
-df.age[2985] = 22
-df.age[3223] = 24
+df.age[2211] = 24
+df.age[2253] = 23
+df.age[2443] = 23
+df.age[3044] = 22
+df.age[3089] = 22
+df.age[3129] = 22
+df.age[3173] = 22
+df.age[3207] = 24
 
 ## filling missing bmi values
-df.bmi[945] = 24.7
-df.bmi[946] = 24.7
-df.bmi[1715] = 25.0
-df.bmi[2760] = 24.7
-df.bmi[2761] = 24.7
+df.bmi[592] = 24.7
+df.bmi[1515] = 24.7
+df.bmi[1594] = 25.0
+df.bmi[2334] = 24.7
+df.bmi[3033] = 24.7
 
 ## filling missing height in inches values
-df.height_inches[945] = 78
-df.height_inches[946] = 78
-df.height_inches[1715] = 71
-df.height_inches[2760] = 78
-df.height_inches[2761] = 78
+df.height_inches[592] = 78
+df.height_inches[1515] = 78
+df.height_inches[1594] = 71
+df.height_inches[2334] = 78
+df.height_inches[3033] = 78
 
 
 # Make a column that computes what season a player is in
