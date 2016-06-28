@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import numpy as np
 %matplotlib inline
 
 df = pd.read_csv('catcherr.csv')
@@ -33,3 +34,18 @@ plt.xlabel('Number of Receptions')
 plt.ylabel('CATCHERR Score')
 plt.savefig('top_2015.png')
 plt.show()
+
+
+df.columns
+df2 = df[(df.rookie_season <2013)& (df.years_in_league<=3)]
+cols_df = df2.drop('name', axis = 1)
+cols_df = df2.drop('years_in_league', axis = 1)
+
+piv_df = df2.pivot_table(index=df2.name, columns='years_in_league', values=cols_df.columns)
+piv_df.head()
+
+mi = piv_df.columns
+new_cols = pd.Index([x[0]+'_'+str(x[1]) for x in mi.tolist()])
+piv_df.columns = new_cols
+
+piv_df.head()
