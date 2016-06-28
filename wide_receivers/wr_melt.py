@@ -1,8 +1,9 @@
 import pandas as pd
-
-df = pd.read_csv('wrs_finalish.csv')
-
-df.drop(['Unnamed: 0', 'Unnamed: 0.1'], axis = 1, inplace = True)
+import matplotlib.pyplot as plt
+%matplotlib inline
+df = pd.read_csv('final_wr.csv')
+df.head()
+df.drop(['Unnamed: 0'], axis = 1, inplace = True)
 
 df.reset_index(inplace=True, drop=True)
 
@@ -35,3 +36,19 @@ pivoted = df3.pivot_table(index=df3.name, columns='years_in_league', values=cols
 
 
 pivoted.shape
+
+pivoted.head()
+zero_cols = ['season', 'yac']
+seasons = [0.0, 1.0, 2.0, 3.0]
+
+for col in zero_cols:
+    for i in seasons:
+        pivoted[col][i].fillna(0,inplace=True)
+
+pivoted['season'][1.0] = pivoted['season'][0.0]+1
+
+pivoted.head()
+
+df2 = pd.read_csv('catcherr.csv')
+df2.receptions.plot(kind='hist')
+plt.show()

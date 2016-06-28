@@ -24,3 +24,5 @@ GABBERT will utilize the following data sources for the years 1999-2015:
 Positional Analyses:
 
 Wide Receievers: 
+
+[Explanation of CATCHERR](https://github.com/cl65610/GABBERT/blob/master/wide_receivers/catcherr.md)
