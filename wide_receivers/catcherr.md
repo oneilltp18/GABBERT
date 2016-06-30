@@ -4,7 +4,7 @@ The success of GABBERT is largely based on our ability to accurately evaluate pl
 
 ![catcherr equation](https://github.com/oneilltp18/GABBERT/blob/master/wide_receivers/CATCHERR_equation.png "catcherr equation")
   
-![catcherr constants](https://github.com/oneilltp18/GABBERT/blob/master/wide_receivers/constants_equations.png "catcherr constants")
+![catcherr constants](https://github.com/oneilltp18/GABBERT/blob/master/wide_receivers/constants_equations.png =400x400)
 
 CATCHERR (The Combined Algorithm for Target-, Catch-, and Hands-Efficiency Receiver Rating) has many advantages that make it ideal for this type of work: 
   * Usage is considered - Player ratings are affected by what percetage of ther team's offense they were responsible for
