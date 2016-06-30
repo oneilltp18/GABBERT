@@ -36,79 +36,11 @@ plt.savefig('top_2015.png')
 plt.show()
 
 
-df.columns
-df2 = df[(df.rookie_season <2013)& (df.years_in_league<=3)]
-
-
-cols_to_keep = []
-for col in df2.columns:
-    if df2[col].isnull().sum() == 0:
-        cols_to_keep.append(col)
-
-cols_to_keep.remove('years_in_league')
-cols_to_keep.remove('team_pass_yds')
-cols_to_keep.remove('team_pass_tds')
-cols_to_keep.remove('team_pass_attempts')
-cols_to_keep.remove('team_completions')
-cols_to_keep.remove('total_points')
-cols_to_keep.append('compilation')
-
-pivoted = df2.pivot_table(index=df2.name, columns='years_in_league', values=cols_to_keep)
-print pivoted.shape
-
-zero_cols = ['games', 'rush_atts', 'rush_yds', 'rush_y/a', 'rush_tds', 'rush_ypg',
-             'targets', 'receptions', 'rec_yards', 'yards/reception', 'rec_tds',
-             'rec_ypg', 'ctch_pct', 'y/tgt', 'fumbles', 'fumbles_recovered', 'fum_ret_yds',
-             'fum_tds', 'forced_fumbles', 'pro_bowls', 'all_pros', '100yd_gms',
-             'first_down_ctchs', 'first_down_ctchpct', 'long_ctch', 'drops', 'EYds',
-             'DVOA', 'DYAR', '40 Yard', 'start_ratio', 'dpis_drawn', 'dpi_yards',
-             'pct_team_tgts', 'pct_team_receptions', 'pct_of_team_passyards',
-             'pct_team_touchdowns', 'dropK', 'yacK', 'td_points', 'compilation']
-
-add_cols = ['season', 'age']
-
-backfill_cols = ['weight', 'bmi', 'rookie_age',
-                 'rookie_season', 'height_inches']
-
-team_cols = ['team_pass_tds', 'team_pass_yds', 'team_pass_attempts', 'team_completions',
-             'total_points']
-
-years = [0.0, 1.0, 2.0, 3.0]
-back_years = [1.0, 2.0, 3.0]
-
-for col in zero_cols:
-    for i in years:
-        pivoted[col][i].fillna(0, inplace = True)
-
-for col in backfill_cols:
-    for i in back_years:
-        pivoted[col][i] = pivoted[col][0.0]
-
-
-pivoted = pivoted[pivoted.season[0.0].isnull() == False]
-
-mi = pivoted.columns
-new_cols = pd.Index([x[0]+'_'+str(x[1]) for x in mi.tolist()])
-pivoted.columns = new_cols
-
-pivoted.rename(columns = lambda x: x.replace('.0', ''), inplace = True)
-
-pivoted['season_1'] = pivoted['season_0']+1
-pivoted['season_2'] = pivoted['season_0']+2
-pivoted['season_3'] = pivoted['season_0']+3
-
-for col in pivoted.columns:
-    if col == 'compilation_3':
-        pass
-    elif str(col)[-2:] =='_3':
-        pivoted.drop(col, axis=1, inplace=True)
-pivoted['age_1'] = pivoted['age_0']+1
-pivoted['age_2'] = pivoted['age_0']+2
 
 from sklearn.cross_validation import train_test_split, cross_val_score
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.feature_selection import SelectKBest
-from sklearn.ensemble import BaggingRegressor
+from sklearn.ensemble import BaggingRegressor, RandomForestClassifier
 from sklearn.linear_model import LinearRegression, Ridge, Lasso, ElasticNet
 from sklearn.preprocessing import scale
 X = pivoted.drop(['compilation_3', 'compilation_0', 'compilation_1', 'compilation_2'], axis = 1)
@@ -152,9 +84,9 @@ X_train, X_test, y_train, y_test = train_test_split(X2, y2, test_size=0.2)
 lr.fit(X_train, y_train)
 lr.score(X_test, y_test)
 pivoted.head()
-mapped_pivot = pd.DataFrame(pivoted)
+mapped_pivot = pd.read_csv('pivot_catcherr.csv')
 
-mapped_pivot.compilation_3 = mapped_pivot.compilation_3.apply(lambda x: 1 if x >= 20 else 0)
+mapped_pivot.compilation_3 = mapped_pivot.compilation_3.apply(lambda x: 1 if x >= 50 else 0)
 
 mapped_pivot.head()
 
@@ -162,7 +94,57 @@ X3 = mapped_pivot[['compilation_0', 'compilation_1', 'compilation_2']]
 y3 = mapped_pivot.compilation_3
 
 from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
 X_train, X_test, y_train, y_test = train_test_split(X3, y3, test_size=0.2)
 log_reg = LogisticRegression()
 log_reg.fit(X_train, y_train)
 log_reg.score(X_test, y_test)
+
+knn = KNeighborsClassifier(n_neighbors=12)
+knn.fit(X_train, y_train)
+knn.score(X_test, y_test)
+
+bins = [-1, 17, 70, 200]
+labels = ['below average', 'quality starter', 'all_pro']
+len(labels)
+
+categories = pd.cut(mapped_pivot['compilation_3'], bins, labels=labels)
+categories.value_counts()
+
+mapped_pivot['categories'] =  pd.cut(mapped_pivot['compilation_3'], bins, labels=labels)
+mapped_pivot.head()
+X3 = mapped_pivot.drop(['categories', 'name', 'compilation_3'], axis=1)
+y3 = mapped_pivot.categories
+kbest = SelectKBest(k=50)
+kbest.fit(scale(X3),mapped_pivot['compilation_3'])
+# Show the feature importance for Kbest of 30
+kbest_importance = pd.DataFrame(zip(X3.columns, kbest.get_support()), columns = ['feature', 'important?'])
+
+kbest_features = kbest_importance[kbest_importance['important?'] == True].feature
+
+X_train, X_test, y_train, y_test = train_test_split(X3[kbest_features], y3, test_size=0.4)
+dtc = DecisionTreeClassifier(max_depth=20)
+dtc.fit(X_train, y_train)
+dtc.score(X_test, y_test)
+from sklearn.metrics import classification_report
+print classification_report(y_test, dtc.predict(X_test))
+
+
+
+# Using PCA to predict compilation_3
+pca_df = pd.read_csv('pca_catcherr.csv')
+mapped_pivot.tail(10)
+pca_df = pca_df.join(mapped_pivot[['compilation_3', 'categories']])
+
+pca_df.head()
+
+X4 = pca_df.drop(['compilation_3', 'categories', 'name'], axis=1)
+y4 = pca_df.categories
+X_train, X_test, y_train, y_test = train_test_split(X4, y4, test_size=0.2)
+
+rfc = RandomForestClassifier(max_depth=25)
+rfc.fit(X_train, y_train)
+rfc.score(X_test, y_test)
+print classification_report(y_test, rfc.predict(X_test))
+rfc.predict_proba(X_test)
