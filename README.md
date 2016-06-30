@@ -27,6 +27,3 @@ Wide Receievers:
 
 [Explanation of CATCHERR](https://github.com/cl65610/GABBERT/blob/master/wide_receivers/catcherr.md)
 
-####CATCHERR FORMULA  
-¬¬catcherr=  ((rec_yards + yacK + dpi_yards + (DYAR×100))  (receptions + fdK +  LcK))/(fumbles +  dropK +  (targets/(%team_targets)))^2 
-
