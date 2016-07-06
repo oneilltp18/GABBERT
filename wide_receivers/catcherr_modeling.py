@@ -75,15 +75,24 @@ df['categories'] =  pd.cut(df['compilation_3'], bins, labels=labels)
 
 df[df.compilation_3 >0].compilation_3.mean()
 
-X = scale(df[features_no_year_1])
+
+from sklearn.cross_validation import cross_val_predict
+X = scale(df[features])
 y = df.categories
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.25)
-cat_weights = {'below average':0.5, 'league_average':8, 'quality starter':4, 'all_pro':4}
+cat_weights = {'below average':0.5, 'league_average':3, 'quality starter':5, 'all_pro':5}
 
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
+preds = cross_val_predict(svc, X, y, cv=10, n_jobs=-1)
+print classification_report(y, preds)
 
-svc = SVC(C = 0.95, class_weight=cat_weights, probability = True, kernel='rbf')
+lda = LinearDiscriminantAnalysis(solver ='lsqr', shrinkage=0.85)
+preds = cross_val_predict(lda, X,y, cv=10, n_jobs=-1, verbose=True)
+print classification_report(y, preds)
+
+svc = SVC(C = 5, gamma = 0.001, class_weight=cat_weights, probability = True, kernel='poly')
 svc.fit(X_train, y_train)
 svc.score(X_test, y_test)
 preds = svc.predict(X_test)
