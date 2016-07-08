@@ -7,9 +7,13 @@ from sklearn.linear_model import LinearRegression, BayesianRidge
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.svm import SVR
 from sklearn.neighbors import KNeighborsRegressor
+import matplotlib.pyplot as plt
+import seaborn as sns
+%matplotlib inline
 
 df = pd.read_csv('final_wr.csv')
-df.tail()
+
+df.shape
 
 
 # Create a column that has a player's height in inches
@@ -222,4 +226,43 @@ df['years_in_league'] = df['season']-df['rookie_season']
 # df_clean['rookie_age'] = df_clean['age'] - df_clean['years_in_league']
 
 
-df.to_csv('final_wr.csv')
+# df.to_csv('final_wr.csv')
+
+df.columns
+teams = df.groupby('team')
+df2 = pd.read_csv('catcherr.csv')
+
+df2.head()
+xes = df2.sort_values('compilation',ascending=False)[0:10].name
+xes
+y = df2[['name', 'season','compilation']].sort_values('compilation', ascending=False)[0:11]
+y = y.drop(1629, axis=0)
+y['xlabel'] = y.index+y.season
+y.season = y.season.astype(int)
+y
+z = zip(y.name, y.season)
+
+plt.style.use('ggplot')
+p =y.sort_values('compilation', ascending=False).compilation.plot(kind='bar')
+p.set_xticklabels(z, rotation=85)
+p.set_ylabel('Compilation Scores')
+p.set_xlabel('Player and Season')
+p.set_ylim([0,200])
+plt.savefig('top_10_alltime.png', bbox_inches='tight', pad_inches=1, transparent=True)
+plt.show()
+
+
+
+
+y_2015 = df2[df2.season==2015]
+y_2015.sort_values('compilation', ascending=False)
+z1 = zip(y_2015.sort_values('compilation', ascending=False)[0:11].name, y_2015.sort_values('compilation', ascending=False)[0:11].team)
+
+plt.style.use('ggplot')
+p =y_2015.sort_values('compilation', ascending=False)[0:11].compilation.plot(kind='bar')
+p.set_xticklabels(z1, rotation=85)
+p.set_ylabel('Compilation Scores')
+p.set_xlabel('Top 2015 Receivers')
+p.set_ylim([0,200])
+plt.savefig('top_10_2015.png', bbox_inches='tight', pad_inches=1, transparent=True)
+plt.show()
