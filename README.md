@@ -18,19 +18,17 @@ NFL players are never more expensive than when they hit the open market of free 
 
 GABBERT will utilize the following data sources for the years 1999-2015:
 * NFL Box Score data
-<<<<<<< HEAD
 * Athletic measures from NFL Draft Combine results for years 1999-2015.
 * Advanced analytics, both positionally (where available), and team-based performance measures.
-=======
 * Athletic measures from NFL Draft Combine results for year
 * Advanced analytics, both positionally (where available), and team-based.
->>>>>>> d7544c44ab65410afe7cdffa860581625b36b65a
-  
+
+
 ## Positional Analyses:
 
-Wide Receievers: 
+Wide Receievers:
 
-Given the large amount of data available for wide receivers, and the relatively large sample size available compared to other positions, we decided to begin our project with wide receievers. The first step in that process required us to create a comprehensive metric for evaluating wide receivers. This metric was useful both for exploratory data analysis and as a target variable for our modeling. A thorough explanation of this metric can be found below.
+Given the large amount of data available for wide receivers, and the relatively large sample size available compared to other positions, we decided to begin our project with wide receivers. The first step in that process required us to create a comprehensive metric for evaluating wide receivers. This metric was useful both for exploratory data analysis and as a target variable for our modeling. A thorough explanation of this metric can be found below.
 
 [CATCHERR Explained](https://github.com/cl65610/GABBERT/blob/master/wide_receivers/catcherr.md)
 
@@ -41,5 +39,3 @@ CATCHERR allowed us to build a predictive model for wide receivers entering the 
 * Further positional analyses/models.
 * Applying GABBERT to college athletics.
 * Investigating Fantasy Football applications.
-
-
