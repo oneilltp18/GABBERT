@@ -29,7 +29,7 @@ Given the large amount of data available for wide receivers, and the relatively 
 
 [CATCHERR Explained](https://github.com/cl65610/GABBERT/blob/master/wide_receivers/catcherr.md)
 
-CATCHERR allowed us to build a predictive model for wide receivers entering the fourth year of their careers. An explanation of our process and results can be found [here](https://github.com/cl65610/GABBERT/blob/master/wide_receivers/wr_results.md)
+CATCHERR allowed us to build a predictive model for wide receivers entering the fourth year of their careers. An explanation of our process and results can be found [here](https://github.com/cl65610/GABBERT/blob/master/wide_receivers/wr_results.md).
 
 
 ## Next Steps
